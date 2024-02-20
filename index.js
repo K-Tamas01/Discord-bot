@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const { createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
-const ytdl = require('ytdl-core');
 const play_yt = require('play-dl')
 const StreamConnection = require('./MusicHandler/Utils/StreamConnection');
 const Player = require('./MusicHandler/Player')
@@ -14,6 +13,7 @@ const bot = new Discord.Client({
 	],
 });
 
+bot.player = new Player()
 const streamConnection = new StreamConnection()
 const voiceConnection = {}
 const options = {
@@ -23,9 +23,12 @@ const options = {
 
 bot.on('messageCreate', async (msg) => {
 
+	await bot.player.guildQueue.createGuildQueue(msg.guild.id)
+	const guildQueue = bot.player.guildQueue.getGuildQueue(msg.guild.id)
+	console.log(guildQueue)
 	const player = createAudioPlayer();
-	//const stream = await ytdl(msg.content, { filter: 'audioonly', quality: 'highestaudio', bitrate: 128 });
 	const stream = await play_yt.stream(msg.content, options)
+	console.log(stream)
 	const resource = createAudioResource(stream.stream, {
 		inlineVolume: true,
 		inputType: stream.type
