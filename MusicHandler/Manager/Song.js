@@ -1,10 +1,8 @@
-const EventEmmitter = require('events')
 const play_yt = require('play-dl')
 const { createAudioResource } = require('@discordjs/voice')
 
-class Song extends EventEmmitter{
+class Song{
     constructor(){
-        super()
         this.options = {
             quality: 2,
             format: 'mp3',
