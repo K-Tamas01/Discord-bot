@@ -4,14 +4,15 @@ class StreamConnection{
 
     join(voiceInfo){
         return joinVoiceChannel({
-            channelId: voiceInfo.voice.channel.id,
-            guildId: voiceInfo.guild.id,
-            adapterCreator: voiceInfo.guild.voiceAdapterCreator
+            channelId: voiceInfo.channelid,
+            guildId: voiceInfo.guildId,
+            adapterCreator: voiceInfo.voiceAdapterCreator
         })
     }
 
     leave(connection){
         if(connection) connection.destroy()
+        return undefined
     }
 
     setVoice(resource, value){
