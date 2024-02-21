@@ -47,20 +47,34 @@ class Player{
         if(this.StreamConnectionCollection[guildId].player.state.status === 'idle') {
             this.StreamConnectionCollection[guildId].player.play(resource)
             this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', (oldStatus, newStatus) => {
-                console.log(newStatus)
-                if(newStatus === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
+                if(newStatus.status === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
                     this.StreamConnectionCollection[guildId].player.play(this.StreamConnectionCollection[guildId].queue.dequeue())
-                    console.log('valami')
                 }
-                else if(newStatus === 'idle' && oldStatus !== 'idle'){
+                else if(newStatus.status === 'idle' && oldStatus.status !== 'idle'){
                     this.destroyConnection(guildId)
-                    console.log('destroy')
                 }
             })
         } else {
             this.StreamConnectionCollection[guildId].queue.enqueue(resource)
         }
-        console.log(this.StreamConnectionCollection[guildId].queue)
+    }
+
+    async playList(content, guildId){
+        const resources = await this.Playlist.play(content)
+        if(this.StreamConnectionCollection[guildId].player.state.status === 'idle') {
+            this.StreamConnectionCollection[guildId].player.play[resources.shift()]
+            this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', (oldStatus, newStatus) => {
+                if(newStatus.status === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
+                    this.StreamConnectionCollection[guildId].player.play(this.StreamConnectionCollection[guildId].queue.dequeue())
+                }
+                else if(newStatus.status === 'idle' && oldStatus.status !== 'idle'){
+                    this.destroyConnection(guildId)
+                }
+            })
+        }
+        for(let track of resources){
+            this.StreamConnectionCollection[guildId].queue.enqueue(track)
+        }
     }
 }
 
