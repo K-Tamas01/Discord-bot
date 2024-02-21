@@ -22,31 +22,22 @@ const options = {
 }
 
 bot.on('messageCreate', async (msg) => {
+	// const player = createAudioPlayer();
+	// const stream = await play_yt.stream(msg.content, options)
+	// const resource = createAudioResource(stream.stream, {
+	// 	inlineVolume: true,
+	// 	inputType: stream.type
+	// })
 
-	await bot.player.guildQueue.createGuildQueue(msg.guild.id)
-	const guildQueue = bot.player.guildQueue.getGuildQueue(msg.guild.id)
-	console.log(guildQueue)
-	const player = createAudioPlayer();
-	const stream = await play_yt.stream(msg.content, options)
-	console.log(stream)
-	const resource = createAudioResource(stream.stream, {
-		inlineVolume: true,
-		inputType: stream.type
-	})
-    const connection = streamConnection.join(msg.member)
-
-	voiceConnection[msg.member.guild.id] = {
-		connection,
-		player,
-		subscribe: connection.subscribe(player)
-	}
+	bot.player.join(msg)
+	bot.player.play(msg.content, msg.guild.id)	
 	
-	await voiceConnection[msg.member.guild.id].player.play(resource)
-	voiceConnection[msg.member.guild.id].player.on(AudioPlayerStatus.Idle, () => {
-		streamConnection.leave(voiceConnection[msg.member.guild.id].connection)
-		voiceConnection[msg.member.guild.id].player.stop()
-		delete voiceConnection[msg.member.guild.id]
-	})
+	// await voiceConnection[msg.member.guild.id].player.play(resource)
+	// voiceConnection[msg.member.guild.id].player.on(AudioPlayerStatus.Idle, () => {
+	// 	streamConnection.leave(voiceConnection[msg.member.guild.id].connection)
+	// 	voiceConnection[msg.member.guild.id].player.stop()
+	// 	delete voiceConnection[msg.member.guild.id]
+	// })
 })
 
 bot.on('ready', () => {
