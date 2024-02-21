@@ -12,7 +12,7 @@ class Song extends EventEmmitter{
     }
 
     async play(content){
-        const is_url = play_yt.yt_validate(content)
+        const is_url = content.startsWith('https')
         if(is_url){
             const stream = await play_yt.stream(content, this.options)
             const resource = createAudioResource(stream.stream, {
@@ -23,7 +23,7 @@ class Song extends EventEmmitter{
             return resource
         } else {
             const searchInfo = await play_yt.search(content, { source : { youtube : "video" }, limit: 1 })
-            const stream = await play_yt.stream(searchInfo.url, this.options)
+            const stream = await play_yt.stream(searchInfo[0].url, this.options)
             const resource = createAudioResource(stream.stream, {
                 inlineVolume: true,
                 inputType: stream.type
