@@ -42,10 +42,10 @@ class Player{
         }
     }
 
-    play(content, guildId){
-        console.log(this.StreamConnectionCollection[guildId].queue)
+    async play(content, guildId){
+        const resource = await this.Song.play(content)
         if(this.StreamConnectionCollection[guildId].player.state.status === 'idle') {
-            this.StreamConnectionCollection[guildId].player.play(this.Song.play(content))
+            this.StreamConnectionCollection[guildId].player.play(resource)
             this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', (oldStatus, newStatus) => {
                 console.log(newStatus)
                 if(newStatus === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
@@ -58,8 +58,9 @@ class Player{
                 }
             })
         } else {
-            this.StreamConnectionCollection[guildId].queue.enqueue(this.Song.play(content))
+            this.StreamConnectionCollection[guildId].queue.enqueue(resource)
         }
+        console.log(this.StreamConnectionCollection[guildId].queue)
     }
 }
 
