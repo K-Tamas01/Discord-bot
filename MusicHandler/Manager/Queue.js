@@ -30,6 +30,14 @@ class Queue {
     size() {
         return this.items.length;
     }
+
+    shuffle(){
+        for(let i = 1; i < this.size(); i++){
+            const j = Math.floor(Math.random() * (i - 1))
+            [this.items[i], this.items[j]] = [this.items[j], this.items[i]]
+        }
+    }
+
 }
 
 module.exports = Queue
