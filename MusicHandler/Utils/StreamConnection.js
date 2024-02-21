@@ -16,16 +16,14 @@ class StreamConnection{
     }
 
     setVoice(resource, value){
-        if(value > 100){
-            value = 1.0
-            resource.volume.setVolume(value)
-        } else if(value < 0){
-            value = 0
-            resource.volume.setVolume(value)
-        }
-        else {
-            resource.volume.setVolume(value / 100)
-        }
+       let volume = value / 100
+       if(volume < 0.0){
+        volume = 0.0
+       } else if(volume > 1.0){
+        volume = 1.0
+       }
+
+       resource.volume.setVolume(volume)
     }
 
     stop(player){
