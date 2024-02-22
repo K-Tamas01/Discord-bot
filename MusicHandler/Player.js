@@ -62,7 +62,7 @@ class Player{
     async playList(content, guildId){
         const resources = await this.Playlist.play(content)
         if(this.StreamConnectionCollection[guildId].player.state.status === 'idle') {
-            this.StreamConnectionCollection[guildId].player.play[resources.shift()]
+            this.StreamConnectionCollection[guildId].player.play(resources.shift())
             this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', (oldStatus, newStatus) => {
                 if(newStatus.status === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
                     this.StreamConnectionCollection[guildId].player.play(this.StreamConnectionCollection[guildId].queue.dequeue())
