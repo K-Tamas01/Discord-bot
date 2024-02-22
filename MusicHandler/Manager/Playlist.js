@@ -13,9 +13,9 @@ class PlayList{
         const is_url = content.startsWith('http')
         const resource = []
         if(is_url){
-            const playlistInfo = await play_dl.playlist_info(content)
-            for(let track of playlistInfo.tracks){
-                const stream = await play_dl.stream(track, this.options)
+            const playlistInfo = await play_dl.playlist_info(content, {incomplete: true})
+            for(let track of playlistInfo.videos){
+                const stream = await play_dl.stream(track.url, this.options)
                 resource.push(createAudioResource(stream.stream, {
                     inlineVolume: true,
                     inputType: stream.type
