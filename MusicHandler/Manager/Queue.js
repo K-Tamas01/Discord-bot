@@ -38,6 +38,9 @@ class Queue {
         }
     }
 
+    destroy(){
+        return this.items = [];
+    }
 }
 
 module.exports = Queue
