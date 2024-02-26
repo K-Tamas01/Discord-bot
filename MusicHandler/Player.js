@@ -29,6 +29,14 @@ class Player extends EventEmitter{
         return this.StreamConnectionCollection[guildId]
     }
 
+    getQueue(guildId){
+        return this.StreamConnectionCollection[guildId].queue
+    }
+
+    destroyQueue(guildId){
+        return this.StreamConnectionCollection[guildId].queue.destroy()
+    }
+
     destroyConnection(guildId){
         this.StreamConnectionCollection[guildId].connection = this.StreamConnection.leave(this.StreamConnectionCollection[guildId].connection)
         delete this.StreamConnectionCollection[guildId]
