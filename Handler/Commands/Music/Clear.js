@@ -4,5 +4,6 @@ module.exports = {
 	description:'$clear',
 	isload: true,
 	run: async (bot, msg, args, guildqueue) => {
-    }
+		bot.player.destroyQueue(msg.guild.id)
+	}
 }
