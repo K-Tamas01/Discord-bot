@@ -3,7 +3,8 @@ const Queue = require('./Manager/Queue')
 const StreamConnection = require('./Utils/StreamConnection')
 const Song = require('./Manager/Song')
 const Playlist = require('./Manager/Playlist')
-const { createAudioPlayer } = require('@discordjs/voice')
+const { createAudioPlayer, createAudioResource } = require('@discordjs/voice')
+const play_yt = require('play-dl')
 
 class Player extends EventEmitter{
     constructor(){
@@ -12,6 +13,18 @@ class Player extends EventEmitter{
         this.StreamConnection = new StreamConnection()
         this.Song = new Song()
         this.Playlist = new Playlist()
+        this.options = {
+            quality: 2,
+            format: 'mp3',
+        }
+        this.getAudioAndPlay = async function(songInfo, guildId){
+            const stream = await play_yt.stream(songInfo.url, this.options)
+            const resource = createAudioResource(stream.stream, {
+                inlineVolume: true,
+                inputType: stream.type
+            })
+            this.StreamConnectionCollection[guildId].player.play(resource)
+        }
     }
 
     createConnection(guildId, result){
@@ -53,13 +66,13 @@ class Player extends EventEmitter{
     }
 
     async play(content, guildId){
-        const resource = await this.Song.play(content)
+        const songInfo = await this.Song.play(content)
         if(this.StreamConnectionCollection[guildId].player.state.status === 'idle') {
-            this.StreamConnectionCollection[guildId].player.play(resource)
+            this.getAudioAndPlay(songInfo[0], guildId)
             this.emit('firstSong')
-            this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', (oldStatus, newStatus) => {
+            this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', async (oldStatus, newStatus) => {
                 if(newStatus.status === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
-                    this.StreamConnectionCollection[guildId].player.play(this.StreamConnectionCollection[guildId].queue.dequeue())
+                    this.getAudioAndPlay(this.StreamConnectionCollection[guildId].queue.dequeue(), guildId)
                     this.emit('songChanged')
                 }
                 else if(newStatus.status === 'idle' && oldStatus.status !== 'idle'){
@@ -68,18 +81,18 @@ class Player extends EventEmitter{
                 }
             })
         } else {
-            this.StreamConnectionCollection[guildId].queue.enqueue(resource)
+            this.StreamConnectionCollection[guildId].queue.enqueue(songInfo[0])
         }
     }
 
     async playList(content, guildId){
-        const resources = await this.Playlist.play(content)
+        const playListInfo = await this.Playlist.play(content)
         if(this.StreamConnectionCollection[guildId].player.state.status === 'idle') {
-            this.StreamConnectionCollection[guildId].player.play(resources.shift())
+            this.getAudioAndPlay(playListInfo.videos[0], guildId)
             this.emit('firstSong')
             this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', (oldStatus, newStatus) => {
                 if(newStatus.status === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
-                    this.StreamConnectionCollection[guildId].player.play(this.StreamConnectionCollection[guildId].queue.dequeue())
+                    this.getAudioAndPlay(this.StreamConnectionCollection[guildId].queue.dequeue(), guildId)
                     this.emit('songChanged')
                 }
                 else if(newStatus.status === 'idle' && oldStatus.status !== 'idle'){
@@ -88,7 +101,7 @@ class Player extends EventEmitter{
                 }
             })
         }
-        for(let track of resources){
+        for(let track of playListInfo.videos){
             this.StreamConnectionCollection[guildId].queue.enqueue(track)
         }
     }
