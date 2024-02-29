@@ -15,7 +15,12 @@ class Queue {
         return this.items.shift();
     }
 
-    // a sor elejének lekérdezése eltávolítás nélkül
+    removeElement(index) {
+        if(this.isEmpty() || index > this.size())
+            return undefined;
+        return this.items.splice(index, 1)
+    }
+    
     peek() {
         if(this.isEmpty())
             return undefined;
