@@ -27,13 +27,14 @@ class Player extends EventEmitter{
         }
     }
 
-    createConnection(guildId, result){
+    createConnection(guildId, result, textChannel){
         this.StreamConnectionCollection[guildId] = {
             connection: this.StreamConnection.join({channelid: result.id, guildId: guildId, voiceAdapterCreator: result.guild.voiceAdapterCreator}),
             player: new createAudioPlayer(),
             subscribe: undefined,
             queue: new Queue(),
-            status: undefined
+            status: undefined,
+            textChannel: textChannel
         }
         this.StreamConnectionCollection[guildId].subscribe = this.StreamConnectionCollection[guildId].connection.subscribe(this.StreamConnectionCollection[guildId].player)
     }
@@ -50,9 +51,25 @@ class Player extends EventEmitter{
         return this.StreamConnectionCollection[guildId].queue.destroy()
     }
 
+    remove(guild, index){
+        return this.StreamConnectionCollection[guildId].queue.removeElement(index)
+    }
+
     destroyConnection(guildId){
         this.StreamConnectionCollection[guildId].connection = this.StreamConnection.leave(this.StreamConnectionCollection[guildId].connection)
         delete this.StreamConnectionCollection[guildId]
+    }
+
+    skip(guildId){
+        this.StreamConnectionCollection[guildId].player.stop()
+    }
+
+    pause(guildId){
+        this.StreamConnectionCollection[guildId].player.pause()
+    }
+
+    unpause(guildId){
+        this.StreamConnectionCollection[guildId].player.unpause()
     }
 
     join(data){
@@ -60,49 +77,48 @@ class Player extends EventEmitter{
         if(result){
             const guildId = result.guild.id
             if(!this.getConnections(guildId)){
-                this.createConnection(guildId, result)
+                this.createConnection(guildId, result, data.channel)
             }
         }
     }
 
     async play(content, guildId){
         const songInfo = await this.Song.play(content)
+        this.StreamConnectionCollection[guildId].queue.enqueue(songInfo[0])
         if(this.StreamConnectionCollection[guildId].player.state.status === 'idle') {
             this.getAudioAndPlay(songInfo[0], guildId)
-            this.emit('firstSong')
+            this.emit('firstSong', this.StreamConnectionCollection[guildId].textChannel, this.StreamConnectionCollection[guildId].queue.peek())
             this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', async (oldStatus, newStatus) => {
                 if(newStatus.status === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
+                    this.emit('songChanged', this.StreamConnectionCollection[guildId].textChannel, this.StreamConnectionCollection[guildId].queue.dequeue(), this.StreamConnectionCollection[guildId].queue.peek())
                     this.getAudioAndPlay(this.StreamConnectionCollection[guildId].queue.dequeue(), guildId)
-                    this.emit('songChanged')
                 }
                 else if(newStatus.status === 'idle' && oldStatus.status !== 'idle'){
+                    this.emit('queueEnd', this.StreamConnectionCollection[guildId].textChannel)
                     this.destroyConnection(guildId)
-                    this.emit('queueEnd')
                 }
             })
-        } else {
-            this.StreamConnectionCollection[guildId].queue.enqueue(songInfo[0])
         }
     }
 
     async playList(content, guildId){
         const playListInfo = await this.Playlist.play(content)
-        if(this.StreamConnectionCollection[guildId].player.state.status === 'idle') {
-            this.getAudioAndPlay(playListInfo.videos[0], guildId)
-            this.emit('firstSong')
-            this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', (oldStatus, newStatus) => {
-                if(newStatus.status === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
-                    this.getAudioAndPlay(this.StreamConnectionCollection[guildId].queue.dequeue(), guildId)
-                    this.emit('songChanged')
-                }
-                else if(newStatus.status === 'idle' && oldStatus.status !== 'idle'){
-                    this.destroyConnection(guildId)
-                    this.emit('queueEnd')
-                }
-            })
-        }
         for(let track of playListInfo.videos){
             this.StreamConnectionCollection[guildId].queue.enqueue(track)
+        }
+        if(this.StreamConnectionCollection[guildId].player.state.status === 'idle') {
+            this.getAudioAndPlay(playListInfo.videos[0], guildId)
+            this.emit('firstSong', this.StreamConnectionCollection[guildId].textChannel, this.StreamConnectionCollection[guildId].queue.peek())
+            this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', (oldStatus, newStatus) => {
+                if(newStatus.status === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
+                    this.emit('songChanged', this.StreamConnectionCollection[guildId].textChannel, this.StreamConnectionCollection[guildId].queue.dequeue(), this.StreamConnectionCollection[guildId].queue.peek())
+                    this.getAudioAndPlay(this.StreamConnectionCollection[guildId].queue.dequeue(), guildId)
+                }
+                else if(newStatus.status === 'idle' && oldStatus.status !== 'idle'){
+                    this.emit('queueEnd', this.StreamConnectionCollection[guildId].textChannel)
+                    this.destroyConnection(guildId) 
+                }
+            })
         }
     }
 }
