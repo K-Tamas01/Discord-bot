@@ -3,6 +3,7 @@ module.exports = {
 	category:'Service',
 	description:'$skip',
 	isload: true,
-	run: async (bot, msg, args, guildqueue) => {
+	run: async (bot, msg) => {
+		await bot.player.skip(msg.guild.id)
     }
 }

@@ -3,6 +3,7 @@ module.exports = {
 	category:'Service',
 	description:'$continue',
 	isload: true,
-	run: async (bot, msg, args, guildqueue) => {
+	run: async (bot, msg) => {
+		bot.player.unpause(msg.guild.id)
     }
 }
