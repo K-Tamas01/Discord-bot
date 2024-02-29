@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const {prefix, token} = require('./Config/config.json')
 const Player = require('./MusicHandler/Player')
+const button = require('./Response/Button')
 const bot = new Discord.Client({
 	intents: [
 		Discord.IntentsBitField.Flags.Guilds,
@@ -40,16 +41,16 @@ bot.on('messageCreate', async (msg) => {
 	command.run(bot, msg, args);
 })
 
-bot.player.on('firstSong', () => {
-
+bot.player.on('firstSong', (guildmsg, song) => {
+	button.run(guildmsg, song, undefined)
 })
 
-bot.player.on('songChanged', () => {
-
+bot.player.on('songChanged', (guildmsg, song, newSong) => {
+	button.run(guildmsg, song, newSong)
 })
 
-bot.player.on('queueEnd', () => {
-
+bot.player.on('queueEnd', (guildmsg) => {
+	button.run(guildmsg, undefined, undefined)
 })
 
 // bot.player.on('queueDestroy', () => {
