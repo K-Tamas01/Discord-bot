@@ -3,6 +3,7 @@ module.exports = {
 	category:'Service',
 	description:'$volume (value)',
 	isload: true,
-	run: async (bot, msg, args, guildqueue) => {
+	run: async (bot, msg, args) => {
+		bot.player.setVolume(msg.guild.id, args)
     }
 }
