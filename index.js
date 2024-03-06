@@ -158,5 +158,5 @@ bot.on('ready', () => {
 	}, 5000)
 })
 
-//bot.login(token)
-bot.login("OTE1MTU3NDExMTg5Mzc1MDQ3.Gf8s1M.n1eKU9kOxROlu2DUUfOHtXvKCDcMv5XiqRSfrU") //Ez az éles bot tokenje NE HASZNÁLD
+bot.login(token)
+//bot.login("OTE1MTU3NDExMTg5Mzc1MDQ3.Gf8s1M.n1eKU9kOxROlu2DUUfOHtXvKCDcMv5XiqRSfrU") //Ez az éles bot tokenje NE HASZNÁLD
