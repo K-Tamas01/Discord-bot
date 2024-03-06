@@ -15,7 +15,7 @@ class StreamConnection{
         return undefined
     }
 
-    setVoice(resource, value){
+    setVolume(resource, value){
        let volume = value / 100
        if(volume < 0.0){
         volume = 0.0
