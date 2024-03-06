@@ -53,9 +53,94 @@ bot.player.on('queueEnd', (guildmsg) => {
 	button.run(guildmsg, undefined, undefined)
 })
 
-// bot.player.on('queueDestroy', () => {
+bot.on('interactionCreate', async (interact) => {
+	if (!interact.isButton()) return;
 
-// })
+	if (interact.member.voice.channel === null || interact.guild.members.me.voice.channel === null || interact.member.voice.channel.id !== interact.guild.members.me.voice.channel.id) {
+		interact.deferUpdate();
+		return;
+	}
+
+	let cmd;
+	let vol = bot.player.getVoice(interact.guild.id);
+	switch (interact.customId) {
+	case 'Play':{
+		cmd = 'continue';
+		break;
+	}
+	case 'volume+':{
+		cmd = 'volume';
+		if ((vol + 10) > 100) break;
+		else vol += 10;
+		break;
+	}
+	case 'volume-':{
+		cmd = 'volume';
+		if ((vol - 10) < 0) break;
+		else vol -= 10;
+		break;
+	}
+	case 'Skip':{
+		cmd = 'skip';
+		break;
+	}
+	case 'Leave':{
+		cmd = 'leave';
+		break;
+	}
+	case 'Pause':{
+		cmd = 'pause';
+		break;
+	}
+	case 'Queue':{
+		cmd = 'queue';
+		break;
+	}
+	}
+
+	let command = bot.command.get(cmd);
+
+	if (!command) command = bot.command.get(bot.aliases.get(cmd));
+
+	switch (interact.customId) {
+	case 'Play':{
+		command.run(bot, interact);
+		interact.deferUpdate();
+		break;
+	}
+	case 'volume+':{
+		command.run(bot, interact, vol);
+		interact.deferUpdate();
+		break;
+	}
+	case 'volume-':{
+		command.run(bot, interact, vol);
+		interact.deferUpdate();
+		break;
+	}
+	case 'Skip':{
+		command.run(bot, interact);
+		interact.deferUpdate();
+		break;
+	}
+	case 'Leave':{
+		command.run(bot, interact);
+		button.run(interact, undefined, undefined)
+		interact.deferUpdate();
+		break;
+	}
+	case 'Pause':{
+		command.run(bot, interact);
+		interact.deferUpdate();
+		break;
+	}
+	case 'Queue':{
+		command.run(bot, interact);
+		interact.deferUpdate();
+		break;
+	}
+	}
+});
 
 bot.on('ready', () => {
 	console.log('Online')
@@ -73,5 +158,5 @@ bot.on('ready', () => {
 	}, 5000)
 })
 
-bot.login(token)
-//bot.login("OTE1MTU3NDExMTg5Mzc1MDQ3.Gf8s1M.n1eKU9kOxROlu2DUUfOHtXvKCDcMv5XiqRSfrU") //Ez az éles bot tokenje NE HASZNÁLD
+//bot.login(token)
+bot.login("OTE1MTU3NDExMTg5Mzc1MDQ3.Gf8s1M.n1eKU9kOxROlu2DUUfOHtXvKCDcMv5XiqRSfrU") //Ez az éles bot tokenje NE HASZNÁLD
