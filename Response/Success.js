@@ -15,7 +15,7 @@ module.exports = {
 		}
 		case 1:{
 
-			let min_part = 1;
+			let min_part = 0;
 			const piece = parseInt(queue.items.length / 25);
 			let max_part, iteration = 0;
 			if (piece === 0) {

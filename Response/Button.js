@@ -6,6 +6,7 @@ module.exports = {
 	run:async (msg, song, newsong) => {
 		if (song === undefined && newsong === undefined) {
 			message_emb[msg.guild.id].delete();
+			delete message_emb[msg.guild.id]
 		}
 		else if (newsong !== undefined) {
 
