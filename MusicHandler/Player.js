@@ -21,7 +21,7 @@ class Player extends EventEmitter{
         this.getAudioAndPlay = async function(songInfo, guildId){
             if(songInfo !== undefined){
                 const stream = await play_yt.stream(songInfo.url, this.options).catch((e) =>{ throw Error("Hiba történt a zene szám letöltésekor. \n Hiba: " + e)})
-                const resource = createAudioResource(stream.stream, {
+                const resource = await createAudioResource(stream.stream, {
                     inlineVolume: true,
                     inputType: stream.type
                 })
@@ -47,13 +47,18 @@ class Player extends EventEmitter{
         }
         this.StreamConnectionCollection[guildId].subscribe = this.StreamConnectionCollection[guildId].connection.subscribe(this.StreamConnectionCollection[guildId].player)
         this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', async (oldStatus, newStatus) => {
-            if(newStatus.status === 'idle' && this.StreamConnectionCollection[guildId].queue.size() > 0){
-                if(this.StreamConnectionCollection[guildId].queueLoop && !this.StreamConnectionCollection[guildId].songLoop){
-                    await this.StreamConnectionCollection[guildId].queue.enqueue(this.nowPlaying[guildId])
+            if(newStatus.status === 'idle' && (this.StreamConnectionCollection[guildId].songLoop || !this.StreamConnectionCollection[guildId].queue.isEmpty())){
+                if(this.StreamConnectionCollection[guildId].songLoop){
+                    this.getAudioAndPlay(this.nowPlaying[guildId], guildId)
                 }
-                this.emit('songChanged', this.StreamConnectionCollection[guildId].textChannel, this.nowPlaying[guildId], this.StreamConnectionCollection[guildId].queue.peek())
-                this.nowPlaying[guildId] = this.StreamConnectionCollection[guildId].queue.dequeue()
-                this.getAudioAndPlay(this.nowPlaying[guildId], guildId)
+                else {
+                    this.emit('songChanged', this.StreamConnectionCollection[guildId].textChannel, this.nowPlaying[guildId], this.StreamConnectionCollection[guildId].queue.peek())
+                    if(this.StreamConnectionCollection[guildId].queueLoop) {
+                        this.StreamConnectionCollection[guildId].queue.enqueue(this.nowPlaying[guildId])
+                    }
+                    this.nowPlaying[guildId] = this.StreamConnectionCollection[guildId].queue.dequeue()
+                    this.getAudioAndPlay(this.nowPlaying[guildId], guildId)
+                }
             }
             else if(newStatus.status === 'idle' && oldStatus.status !== 'idle'){
                 this.emit('queueEnd', this.StreamConnectionCollection[guildId].textChannel)
@@ -103,6 +108,10 @@ class Player extends EventEmitter{
 
     queueLoop(guildId){
         this.StreamConnectionCollection[guildId].queueLoop ? this.StreamConnectionCollection[guildId].queueLoop = false : this.StreamConnectionCollection[guildId].queueLoop = true
+    }
+
+    songLoop(guildId){
+        this.StreamConnectionCollection[guildId].songLoop ? this.StreamConnectionCollection[guildId].songLoop = false : this.StreamConnectionCollection[guildId].songLoop = true
     }
 
     setVolume(guildId, value){
