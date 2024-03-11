@@ -9,10 +9,8 @@ module.exports = {
 			delete message_emb[msg.guild.id]
 		}
 		else if (newsong !== undefined) {
-
 			const content = new EmbedBuilder()
 				.setTitle(`Most játszom éppen: ${newsong.title}`)
-				.setColor('#0099ff')
 				.setColor('#FF1493');
 
 			message_emb[msg.guild.id].edit({ embeds: [content] });
@@ -61,10 +59,9 @@ module.exports = {
             
 			const content = new EmbedBuilder()
 				.setTitle(`Most játszom éppen: ${song.title}`)
-				.setColor('#0099ff')
 				.setColor('#FF1493');
 
-			message_emb[msg.guild.id] = await msg.send({ ephemeral: true, embeds: [content], components: [buttons, buttons2] });
+			message_emb[msg.guild.id] = await msg.send({ ephemeral: true, embeds: [content], components: [buttons, buttons2] })
 		}
 	},
 };
