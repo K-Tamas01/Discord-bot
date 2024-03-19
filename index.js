@@ -62,7 +62,7 @@ bot.on('interactionCreate', async (interact) => {
 	}
 
 	let cmd;
-	let vol = bot.player.getVoice(interact.guild.id);
+	let vol = bot.player.getVoiceVolume(interact.guildId);
 	switch (interact.customId) {
 	case 'Play':{
 		cmd = 'continue';
@@ -142,18 +142,22 @@ bot.on('interactionCreate', async (interact) => {
 	}
 });
 
+process.on('warning', (e) => {
+	console.log(e)
+})
+
 bot.on('ready', () => {
 	console.log('Online')
 
 	const stat = [
-		'Üzemen kivül!',
+		'Tesztelés alatt!!!!',
 	]
 
 	setInterval(function() {
 		const status = stat[Math.floor(Math.random() * stat.length)]
 		bot.user.setPresence({
 			activities: [{ name: status, type: Discord.ActivityType.Watching }],
-			status: 'online',
+			status: 'dnd',
 		});
 	}, 5000)
 })
