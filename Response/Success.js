@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
-	run:async (msg, code, queue, args, user) => {
+	run: (msg, code, queue, args, user) => {
 		switch (code) {
 		case 0:{
 			const content = new EmbedBuilder()
@@ -35,7 +35,7 @@ module.exports = {
 						.setTimestamp();
 
 					for (let i = min_part; i < max_part; i++) {
-						content.addFields({ name: queue.items[i].title, value: ' [' + queue.items[i].durationRaw + ']', inline: false });
+						content.addFields({ name: queue.items[i].title, value: ' [' + queue.items[i].duration + ']', inline: false });
 					}
 				}
 				else {
@@ -46,7 +46,7 @@ module.exports = {
 						.setTimestamp();
 
 					for (let i = min_part; i < max_part; i++) {
-						content.addFields({ name: queue.items[i].title, value: ' [' + queue.items[i].durationRaw + ']', inline: false });
+						content.addFields({ name: queue.items[i].title, value: ' [' + queue.items[i].duration + ']', inline: false });
 					}
 				}
 				msg.channel.send({ embeds: [content] });
