@@ -3,7 +3,7 @@ const Queue = require('./Manager/Queue')
 const StreamConnection = require('./Utils/StreamConnection')
 const Song = require('./Manager/Song')
 const Playlist = require('./Manager/Playlist')
-const { createAudioPlayer, createAudioResource } = require('@discordjs/voice')
+const { createAudioPlayer, createAudioResource, StreamType } = require('@discordjs/voice')
 const play_yt = require('play-dl')
 
 class Player extends EventEmitter{
@@ -21,9 +21,9 @@ class Player extends EventEmitter{
         this.getAudioAndPlay = async function(songInfo, guildId){
             if(songInfo !== undefined){
                 const stream = await play_yt.stream(songInfo.url, this.options).catch((e) =>{ throw Error("Hiba történt a zene szám letöltésekor. \n Hiba: " + e)})
-                const resource = await createAudioResource(stream.stream, {
+                const resource = createAudioResource(stream.stream, {
                     inlineVolume: true,
-                    inputType: stream.type
+                    inputType: StreamType.Opus,
                 })
                 this.StreamConnectionCollection[guildId].resource = resource
                 this.StreamConnectionCollection[guildId].player.play(resource)
@@ -114,11 +114,11 @@ class Player extends EventEmitter{
         this.StreamConnectionCollection[guildId].songLoop ? this.StreamConnectionCollection[guildId].songLoop = false : this.StreamConnectionCollection[guildId].songLoop = true
     }
 
-    setVolume(guildId, value){
+    setVoiceVolume(guildId, value){
         this.StreamConnection.setVolume(this.StreamConnectionCollection[guildId].resource, value)
     }
 
-    getVoice(guildId){
+    getVoiceVolume(guildId){
         return (this.StreamConnectionCollection[guildId].resource.volume.volume * 100)
     }
 
