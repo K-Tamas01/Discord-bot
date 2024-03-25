@@ -22,7 +22,6 @@ class Song{
         } else {
             const searchResult = await play_yt.search(content, {source: { youtube: "video"}, limit: 20 })
             const result = this.greatestFit(searchResult, content)
-            console.log(result[0].url)
             this.searchInfo[0] = {
                 url: result[0].url,
                 type: result[0].type,
