@@ -3,7 +3,7 @@ const Queue = require('./Manager/Queue')
 const StreamConnection = require('./Utils/StreamConnection')
 const Song = require('./Manager/Song')
 const Playlist = require('./Manager/Playlist')
-const { createAudioPlayer, createAudioResource, StreamType } = require('@discordjs/voice')
+const { createAudioPlayer, createAudioResource } = require('@discordjs/voice')
 const play_yt = require('play-dl')
 
 class Player extends EventEmitter{
@@ -15,6 +15,7 @@ class Player extends EventEmitter{
         this.Playlist = new Playlist()
         this.nowPlaying = {}
         this.options = {
+            seek: 0,
             quality: 2,
             format: 'mp3',
         }
@@ -23,10 +24,10 @@ class Player extends EventEmitter{
                 const stream = await play_yt.stream(songInfo.url, this.options).catch((e) =>{ throw Error("Hiba történt a zene szám letöltésekor. \n Hiba: " + e)})
                 const resource = createAudioResource(stream.stream, {
                     inlineVolume: true,
-                    inputType: StreamType.Opus,
+                    inputType: stream.type,
                 })
                 this.StreamConnectionCollection[guildId].resource = resource
-                this.StreamConnectionCollection[guildId].player.play(resource)
+                this.StreamConnectionCollection[guildId].player.play(this.StreamConnectionCollection[guildId].resource)
             } else {
                 throw Error('Hibás link vagy argumentum.')
             }
@@ -39,17 +40,18 @@ class Player extends EventEmitter{
             player: new createAudioPlayer(),
             subscribe: undefined,
             queue: new Queue(),
-            status: undefined,
             textChannel: textChannel,
             queueLoop: false,
             songLoop: false,
             resource: undefined
         }
         this.StreamConnectionCollection[guildId].subscribe = this.StreamConnectionCollection[guildId].connection.subscribe(this.StreamConnectionCollection[guildId].player)
-        this.StreamConnectionCollection[guildId].status = this.StreamConnectionCollection[guildId].player.on('stateChange', async (oldStatus, newStatus) => {
+        this.StreamConnectionCollection[guildId].player.on('stateChange', async (oldStatus, newStatus) => {
             if(newStatus.status === 'idle' && (this.StreamConnectionCollection[guildId].songLoop || !this.StreamConnectionCollection[guildId].queue.isEmpty())){
                 if(this.StreamConnectionCollection[guildId].songLoop){
-                    this.getAudioAndPlay(this.nowPlaying[guildId], guildId)
+                    setTimeout(function() {
+                        this.getAudioAndPlay(this.nowPlaying[guildId], guildId)
+                    }.bind(this), 1000)
                 }
                 else {
                     this.emit('songChanged', this.StreamConnectionCollection[guildId].textChannel, this.nowPlaying[guildId], this.StreamConnectionCollection[guildId].queue.peek())
@@ -57,7 +59,9 @@ class Player extends EventEmitter{
                         this.StreamConnectionCollection[guildId].queue.enqueue(this.nowPlaying[guildId])
                     }
                     this.nowPlaying[guildId] = this.StreamConnectionCollection[guildId].queue.dequeue()
-                    this.getAudioAndPlay(this.nowPlaying[guildId], guildId)
+                    setTimeout(function() {
+                        this.getAudioAndPlay(this.nowPlaying[guildId], guildId)
+                    }.bind(this), 1000)
                 }
             }
             else if(newStatus.status === 'idle' && oldStatus.status !== 'idle'){
@@ -80,7 +84,7 @@ class Player extends EventEmitter{
         return this.StreamConnectionCollection[guildId].queue.destroy()
     }
 
-    remove(guild, index){
+    remove(guildId, index){
         return this.StreamConnectionCollection[guildId].queue.removeElement(index)
     }
 
