@@ -18,7 +18,13 @@ class Player extends EventEmitter{
             seek: 0,
             quality: 2,
             format: 'mp3',
+            discordPlayerCompatibility: true,
         }
+        play_yt.setToken({
+            youtube: {
+                cookie: "HSID=AlfPiJNdREX6zShRd; SSID=AStBcrd7v-lPYUJob; APISID=lLKK7OGgyrsegDId/As9ahh4BIgVa0KLaC; SAPISID=B4y5P7DC3Sud0EbY/AeMsHz_s9RbQS6K9B; __Secure-1PAPISID=B4y5P7DC3Sud0EbY/AeMsHz_s9RbQS6K9B; __Secure-3PAPISID=B4y5P7DC3Sud0EbY/AeMsHz_s9RbQS6K9B; LOGIN_INFO=AFmmF2swRAIgZIxJm3kuz_ZS39qQVbz5dMwUQQXnNkHDVbmNiBvwOb0CIDc-dSZ0y84DGMXCaJjQkH1MepyFP8k0k_fOFwykAI_9:QUQ3MjNmeF92NzVBVEZIcE9nUFdhbHdjRDQyV2xlZWx6TS1Fak1nOXJkX1lQVUtDc05vRm5nQW42TklBVUk5QVpBQmRTXzNGREg4aXlmMnY4MGQwYTl4dGhXVjRiMHc0LXI1R2J1dWJzcXpseXVWNUVKZzl1SEhsWndwUWpqZW9mcWxaWHkweEhQVWs0M2d0bnlZYmFKLWJkWlRVeDk5bFBn; PREF=tz=Europe.Budapest&f7=100; VISITOR_PRIVACY_METADATA=CgJIVRIcEhgSFhMLFBUWFwwYGRobHB0eHw4PIBAREiEgXw%3D%3D; SID=g.a000mAhCMlC2Co5J31QV0AAmBDwXf2vsHgJQqStfFzHLAqg_wFIi3VeePxy7lOiiMBrZPk1tJgACgYKAUwSARcSFQHGX2MiDm0LNEoyDLC-NH8mM4QaihoVAUF8yKonVZZ5YI0G34w_WytXf-7J0076; __Secure-1PSID=g.a000mAhCMlC2Co5J31QV0AAmBDwXf2vsHgJQqStfFzHLAqg_wFIijYsTSTXh8T5UfI-rA4oeGQACgYKAXsSARcSFQHGX2MinF3FmyJTcRcdHnQM5wF0MRoVAUF8yKrwHYfAyQ61zyTeloKRuKoH0076; __Secure-3PSID=g.a000mAhCMlC2Co5J31QV0AAmBDwXf2vsHgJQqStfFzHLAqg_wFIi1JcYFOQFkp5nLSfh4QKjqwACgYKATASARcSFQHGX2MipL7y1A043xwWNbPTrFooUxoVAUF8yKpcB-90NNQRv46buox6oFE10076; YSC=4D3ysuEugXk; __Secure-1PSIDTS=sidts-CjEB4E2dkbCBkztX4-2GU2TycwP8LZuayaixr8Zv78X6oYA_WVdbuuJQ2WsKN0b_NCyMEAA; __Secure-3PSIDTS=sidts-CjEB4E2dkbCBkztX4-2GU2TycwP8LZuayaixr8Zv78X6oYA_WVdbuuJQ2WsKN0b_NCyMEAA; CONSISTENCY=AKreu9ubHJnve8-FwCnXomWpOJ6Va3C7eeyR5Fo0UNtWG9qHquKFwGupB0eWvZSfGL5Bj-aeTrRJe0Ejy0I7saPki_Z9mt7VLW62AesU0LWBj5oE9h8MpSiGvWfK55Civ-IFxP-DTuL7knzLt5vZTTYH; __Secure-YEC=CgtHTEVfV3R6RmhZbyi7hv20BjIiCgJIVRIcEhgSFhMLFBUWFwwYGRobHB0eHw4PIBAREiEgXw%3D%3D; SIDCC=AKEyXzWMOvfFETf12euVV29k5cWYFIl6MddT2QHmMLgf7qgKbgrl9YRmcbc6y-i-OSp4CffkKw; __Secure-1PSIDCC=AKEyXzUioce13aWc-5t1f59XwxOlt1lYemCivJz5P3CLXJWBv4x_5x__sHhtsEZ_Mi2T_FAIFec; __Secure-3PSIDCC=AKEyXzUDZ3pOwQPiO4MFsqH6BVHVV7DFjKmqu9anaa-ZxmvJ_jcKniQhBS1ks3HvXxJ3ruiY14U"
+            }
+        })
         this.getAudioAndPlay = async function(songInfo, guildId){
             if(songInfo !== undefined){
                 const stream = await play_yt.stream(songInfo.url, this.options).catch((e) =>{ throw Error("Hiba történt a zene szám letöltésekor. \n Hiba: " + e)})
